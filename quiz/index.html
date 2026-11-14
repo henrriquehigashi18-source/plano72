@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<script>
+  /* Garante a barra no fim do endereço (/quiz/), para os arquivos desta pasta carregarem em qualquer hospedagem. */
+  (function(){var p=location.pathname;if(!/\/$/.test(p)&&!/\.html?$/.test(p)){location.replace(p+'/'+location.search+location.hash);}})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste gratuito: sua casa aguenta 72 horas sem luz? | Plano 72</title>
+<meta name="description" content="Faça o teste gratuito de 3 minutos e receba o Índice Família a Salvo da sua casa: quantas horas ela aguenta sem luz, sem água e sem Pix, e o que fazer primeiro.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sua família aguentaria 72 horas sem luz, sem água e sem Pix?">
+<meta property="og:description" content="Teste gratuito de 3 minutos. Descubra o Índice Família a Salvo da sua casa.">
+<meta property="og:image" content="https://plano72h.vercel.app/capa.png">
+<meta name="theme-color" content="#FBF6EA">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%94%A6%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="quiz.css">
+
+<!-- Meta Pixel -->
+<script>
+  (function(){
+    var PIXELS = ['3643961712434919', '2025033762234276'];
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    PIXELS.forEach(function(id){ fbq('init', id); });
+    fbq('track', 'PageView');
+    fbq('track', 'ViewContent', {content_name: 'Quiz Plano 72'});
+  })();
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=3643961712434919&ev=PageView&noscript=1"/><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=2025033762234276&ev=PageView&noscript=1"/></noscript>
+</head>
+<body class="theme-day">
+
+<!-- Luz do ambiente: clara de dia, facho de lanterna durante o apagão -->
+<div class="atmo" aria-hidden="true"><div class="atmo-day"></div><div class="atmo-night"><i></i></div></div>
+
+<!-- Painel da simulação: hora do apagão, bateria do celular e progresso -->
+<header class="hud" id="hud" hidden>
+  <div class="hud-row">
+    <button class="hud-back" id="hud-back" type="button" aria-label="Voltar para a tela anterior">‹</button>
+    <span class="hud-chip">Simulação</span>
+    <span class="hud-hour" id="hud-hour">Hora 0 de 72</span>
+    <span class="hud-batt" id="hud-batt" aria-hidden="true"><span class="batt"><i id="batt-fill"></i></span><b id="batt-pct">100%</b></span>
+  </div>
+  <div class="hud-bar" id="hud-bar" role="progressbar" aria-label="Progresso do teste" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="hud-bar-fill"></i></div>
+</header>
+
+<main class="app" id="app">
+  <section class="intro" id="intro">
+    <div class="lamp" id="intro-lamp" aria-hidden="true"><span class="lamp-bulb"></span></div>
+    <p class="tag">⚠️ Defesa Civil recomenda kit de 72 horas</p>
+    <h1 tabindex="-1">Sua família aguentaria <em>72 horas</em> sem luz, sem água e sem Pix?</h1>
+    <p class="intro-sub">Faça o teste gratuito e receba o <strong>Índice Família a Salvo</strong> da sua casa, com base nas orientações da Defesa Civil.</p>
+    <p class="intro-label">Você vai descobrir:</p>
+    <ul class="intro-list">
+      <li>Quantas horas sua casa aguenta hoje, se tudo parar</li>
+      <li>Quantos litros de água sua família precisa ter guardados</li>
+      <li>Os 3 pontos fracos da sua casa, em ordem de prioridade</li>
+      <li>O que fazer primeiro, gastando pouco</li>
+    </ul>
+    <p class="intro-proof">🌎 Painel El Niño 2026–2027 (INMET, INPE, Cemaden e Defesa Civil): o boletim de outubro prevê elevada probabilidade de El Niño muito forte a partir de novembro.</p>
+    <button class="btn" id="start" type="button">Iniciar teste gratuito</button>
+    <p class="intro-micro">3 minutos · resultado na hora · sem cadastro</p>
+  </section>
+</main>
+
+<noscript><p class="noscript">Este teste precisa de JavaScript ativado. <a href="../">Conheça o Plano 72 · Família a Salvo</a>.</p></noscript>
+
+<footer class="foot">
+  <p>Simulação educativa. Não substitui as orientações da Defesa Civil nem de autoridades locais.</p>
+  <p><a href="../privacidade.html">Privacidade</a> · <a href="../termos.html">Termos</a> · <a href="../">Plano 72</a></p>
+  <p>Este site não é afiliado ao Facebook nem à Meta.</p>
+</footer>
+
+<script src="quiz-logic.js" defer></script>
+<script src="quiz-data.js" defer></script>
+<script src="quiz-dom.js" defer></script>
+<script src="quiz-result.js" defer></script>
+<script src="quiz.js" defer></script>
+</body>
+</html>
