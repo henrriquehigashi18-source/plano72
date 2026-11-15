@@ -18,6 +18,7 @@
       prova1: '',
       prova2: '',
       prova3: '',
+      prova4: '',
       capa: '../capa.png'
     },
 
@@ -33,33 +34,37 @@
 
   var REGION_NAMES = { norte: 'Norte', nordeste: 'Nordeste', co: 'Centro-Oeste', sudeste: 'Sudeste', sul: 'Sul' };
 
-  var FORECAST_RAIN = 'Os órgãos de meteorologia preveem chuva acima do normal até janeiro. Temporal forte pode derrubar a rede elétrica, alagar ruas e deixar bairros sem luz e sem água por dias.';
-  var FORECAST_HEAT = 'A previsão é de calor acima da média e temporais de verão. Em São Paulo, temporais já deixaram milhões de imóveis sem luz por vários dias.';
-  var FORECAST_DRY = 'A previsão é de chuva abaixo do normal e calor forte. A seca pode levar a racionamento de água, e o calor sobrecarrega a rede elétrica.';
-  var REGION_FORECAST = { sul: FORECAST_RAIN, sudeste: FORECAST_HEAT, co: FORECAST_HEAT, norte: FORECAST_DRY, nordeste: FORECAST_DRY };
+  /* Prova 1: um título que já diz tudo e uma linha de apoio. */
+  var REGION_PROOF = {
+    sul: { title: 'chuva forte prevista até janeiro', line: 'Temporal derruba a rede e deixa bairros sem luz e sem água por dias.' },
+    sudeste: { title: 'calor e temporais previstos', line: 'Em São Paulo, temporais já deixaram milhões sem luz por dias.' },
+    co: { title: 'calor e temporais previstos', line: 'Temporal derruba a rede, e o calor sobrecarrega a energia.' },
+    norte: { title: 'seca e calor previstos', line: 'A seca pode levar a racionamento de água, e o calor sobrecarrega a rede.' },
+    nordeste: { title: 'seca e calor previstos', line: 'A seca pode levar a racionamento de água, e o calor sobrecarrega a rede.' }
+  };
 
-  var WATER_ANSWER_TEXT = { a0: 'menos de 1 dia', a1: '1 a 2 dias', a2: 'uns 3 dias', a3: 'mais de 3 dias' };
+  var WATER_ANSWER_TEXT = { a0: 'nenhuma água guardada', a1: 'algumas garrafas', a2: 'um galão', a3: 'galões para vários dias' };
 
   /* Telas de transição: a luz acaba no começo e volta antes do diagnóstico. */
-  var blackout = { lamp: 'off', title: 'A luz acabou.', sub: '19h42 · o bairro inteiro está no escuro' };
-  var lightsBack = { lamp: 'on', title: 'A luz voltou.', sub: 'Hora 72 · agora veja como a sua casa se saiu' };
+  var blackout = { lamp: 'off', title: 'A luz acabou.', sub: '19h42 · sem previsão de volta' };
+  var lightsBack = { lamp: 'on', title: 'A luz voltou.', sub: 'Desta vez. Veja como sua casa se saiu.' };
 
   var steps = [
-    /* ---------- BLOCO S — SITUAÇÃO ---------- */
+    /* ---------- AQUECIMENTO: perguntas fáceis ---------- */
     {
-      id: 'q1', type: 'single', n: 1, hour: 0,
-      title: 'Se a luz acabasse agora e só voltasse daqui a 72 horas, como sua família estaria?',
+      id: 'q3', type: 'single', n: 1, hour: 0,
+      title: 'Quantas pessoas moram na sua casa?',
       options: [
-        { id: 'bem', label: 'Bem preparada' },
-        { id: 'mais', label: 'Mais ou menos' },
-        { id: 'pouco', label: 'Pouco preparada' },
-        { id: 'nunca', label: 'Nunca pensei nisso' }
+        { id: 'p1', label: 'Só eu' },
+        { id: 'p2', label: '2' },
+        { id: 'p3', label: '3' },
+        { id: 'p4', label: '4' },
+        { id: 'p5', label: '5 ou mais' }
       ]
     },
     {
       id: 'q2', type: 'single', n: 2, hour: 1,
       title: 'Em qual região você mora?',
-      help: 'O El Niño afeta cada região de um jeito.',
       options: [
         { id: 'norte', label: 'Norte' },
         { id: 'nordeste', label: 'Nordeste' },
@@ -69,274 +74,272 @@
       ]
     },
     {
-      id: 'q3', type: 'single', n: 3, hour: 2,
-      title: 'Quantas pessoas moram na sua casa, contando com você?',
-      help: 'Usamos isso para calcular do que sua família precisa.',
+      id: 'q1', type: 'single', n: 3, hour: 2,
+      title: function (ctx) { return ctx.solo ? 'Se a luz acabasse agora, você estaria pronto?' : 'Se a luz acabasse agora, sua família estaria pronta?'; },
       options: [
-        { id: 'p1', label: 'Só eu' },
-        { id: 'p2', label: '2 pessoas' },
-        { id: 'p3', label: '3 pessoas' },
-        { id: 'p4', label: '4 pessoas' },
-        { id: 'p5', label: '5 ou mais' }
+        { id: 'bem', label: 'Sim, estaria' },
+        { id: 'mais', label: 'Mais ou menos' },
+        { id: 'pouco', label: 'Não estaria' },
+        { id: 'nunca', label: 'Nunca pensei nisso' }
       ]
     },
     {
       id: 'p1', type: 'proof', hour: 3,
-      kicker: 'Boletim do tempo',
-      title: function (ctx) { return REGION_NAMES[ctx.region] + ': o que pode vir nos próximos meses'; },
+      kicker: 'Previsão para a sua região',
+      title: function (ctx) { return REGION_NAMES[ctx.region] + ': ' + REGION_PROOF[ctx.region].title; },
       image: { key: 'prova1', alt: 'Previsão do El Niño para a sua região', placeholder: 'Mapa ou ilustração da previsão para a região' },
       blocks: function (ctx) {
         return [
-          { kind: 'text', text: REGION_FORECAST[ctx.region] },
-          { kind: 'text', text: 'A Defesa Civil orienta toda família a ter o necessário para passar **pelo menos 72 horas** por conta própria. Vamos ver como está a sua casa.' },
-          { kind: 'source', text: 'Fonte: Painel El Niño 2026–2027 (INMET, INPE, Cemaden e Defesa Civil), boletim de outubro de 2026.' }
+          { kind: 'text', text: REGION_PROOF[ctx.region].line },
+          { kind: 'source', text: 'Fonte: Painel El Niño (INMET, INPE, Cemaden e Defesa Civil), out/2026.' }
         ];
       }
     },
 
-    /* ---------- BLOCO P — PROBLEMA ---------- */
+    /* ---------- O QUE PARA QUANDO A LUZ ACABA ---------- */
     {
       id: 'q4', type: 'single', n: 4, hour: 5,
-      title: 'Como a água chega na torneira da sua casa?',
-      help: 'Isso muda o que acontece quando a luz cai.',
+      title: 'Como a água chega na sua torneira?',
       options: [
         { id: 'rua', label: 'Direto da rua' },
-        { id: 'caixa', label: 'De uma caixa d\'água em casa' },
-        { id: 'predio', label: 'Moro em prédio, com bomba que sobe a água' },
-        { id: 'poco', label: 'De um poço ou bomba própria' }
+        { id: 'caixa', label: 'De uma caixa d\'água' },
+        { id: 'predio', label: 'Prédio, com bomba' },
+        { id: 'poco', label: 'Poço ou bomba própria' }
       ]
     },
     {
       id: 'q5', type: 'multi', n: 5, hour: 7,
-      title: 'Se a luz acabasse agora, o que pararia de funcionar na sua casa?',
-      help: 'Marque tudo o que se aplica.',
+      title: 'Sem luz, o que para na sua casa?',
+      help: 'Marque tudo.',
       options: [
-        { id: 'geladeira', label: 'Geladeira e freezer' },
-        { id: 'agua', label: 'A água (bomba ou caixa que depende de energia)' },
-        { id: 'internet', label: 'Internet e carregador do celular' },
-        { id: 'fogao', label: 'Fogão (elétrico, de indução ou com acendimento elétrico)' },
-        { id: 'pix', label: 'Pix, maquininha e caixa eletrônico do bairro' },
-        { id: 'aparelho', label: 'Algum aparelho de saúde' }
+        { id: 'geladeira', label: 'Geladeira' },
+        { id: 'agua', label: 'A água da torneira' },
+        { id: 'internet', label: 'Internet e carregador' },
+        { id: 'fogao', label: 'Fogão' },
+        { id: 'pix', label: 'Pix e cartão' },
+        { id: 'aparelho', label: 'Aparelho de saúde' }
       ]
     },
     {
       id: 'q6', type: 'single', n: 6, hour: 10, pillar: 'agua',
-      title: 'Se a água parasse de chegar hoje, por quanto tempo vocês teriam água para beber?',
+      title: 'Quanta água para beber vocês têm guardada?',
       help: function (ctx) {
-        if (ctx.stopCount === 0) return 'Vamos começar pelo mais importante: a água.';
-        var marked = ctx.stopCount === 1 ? '1 coisa que para' : ctx.stopCount + ' coisas que param';
-        return 'Você marcou ' + marked + ' junto com a luz. Vamos começar pela mais importante: a água.';
+        if (ctx.stopCount < 2) return '';
+        return ctx.stopCount + ' coisas param junto com a luz. A primeira que faz falta é a água.';
       },
       options: [
-        { id: 'a0', label: 'Menos de 1 dia', score: 0 },
-        { id: 'a1', label: 'De 1 a 2 dias', score: 1 },
-        { id: 'a2', label: 'Uns 3 dias', score: 2 },
-        { id: 'a3', label: 'Mais de 3 dias, com galões guardados', score: 3 }
+        { id: 'a0', label: 'Nenhuma, só a da torneira', score: 0 },
+        { id: 'a1', label: 'Algumas garrafas', score: 0 },
+        { id: 'a2', label: 'Um galão', score: 1 },
+        { id: 'a3', label: 'Galões para vários dias', score: 3 }
       ]
     },
     {
       id: 'p2', type: 'proof', hour: 12,
       kicker: 'A conta que quase ninguém faz',
-      title: function (ctx) { return 'Sua casa precisa de ' + ctx.litersLabel + ' litros de água para 72 horas'; },
-      image: { key: 'prova2', alt: 'Galões de água guardados em casa', placeholder: 'Foto de galões de água (20 L e 5 L)' },
+      title: function (ctx) { return 'Sua casa precisa de ' + ctx.litersLabel + ' litros de água'; },
+      image: { key: 'prova2', alt: 'Galões de água guardados em casa', placeholder: 'Foto de galões de água' },
       blocks: function (ctx) {
-        var blocks = [
-          { kind: 'text', text: 'São 4 litros por pessoa por dia, para beber, cozinhar e a higiene básica.' },
-          { kind: 'text', text: 'Um galão de 20 litros dura cerca de **' + ctx.gallonLabel + '** na sua casa.' }
-        ];
-        if (ctx.pump) {
-          blocks.push({ kind: 'warn', text: 'Na sua casa, a água depende de bomba elétrica. Quando a luz acaba, ela para de chegar assim que a caixa esvazia.' });
-        }
+        var blocks = [{ kind: 'text', text: 'Isso só para os **3 primeiros dias**. E se durar mais?' }];
+        if (ctx.pump) blocks.push({ kind: 'warn', text: 'Sem luz, a bomba para. A água acaba quando a caixa esvaziar.' });
         return blocks;
       }
     },
     {
       id: 'q7', type: 'single', n: 7, hour: 16, pillar: 'comida',
-      title: 'Agora imagine 3 dias sem geladeira e sem fogão. O que vocês comeriam?',
+      title: 'Sem geladeira e sem fogão, o que vocês comeriam?',
       options: [
-        { id: 'c0', label: 'Não saberia o que fazer', score: 0 },
-        { id: 'c1', label: 'O que tem na geladeira, enquanto durar', score: 1 },
-        { id: 'c2', label: 'Temos algumas coisas, mas não para 3 dias', score: 2 },
-        { id: 'c3', label: 'Temos comida pronta para 3 dias, que não precisa de fogão', score: 3 }
+        { id: 'c0', label: 'Não sei', score: 0 },
+        { id: 'c1', label: 'O que tem na geladeira, até estragar', score: 0 },
+        { id: 'c2', label: 'Bolacha e o que sobrar no armário', score: 1 },
+        { id: 'c3', label: 'Comida pronta guardada para vários dias', score: 3 }
       ]
     },
     {
       id: 'q8', type: 'single', n: 8, hour: 22, pillar: 'energia',
-      title: 'À noite, sem energia, como vocês iam enxergar e manter o celular ligado?',
+      title: 'À noite, sem luz, o que vocês usariam?',
       options: [
-        { id: 'celular', label: 'Só com a lanterna do próprio celular', score: 0 },
-        { id: 'velas', label: 'Com velas', score: 0 },
-        { id: 'lanterna', label: 'Com uma lanterna, sem pilha nem carregador reserva', score: 1 },
-        { id: 'pilhas', label: 'Com lanternas e pilhas reserva', score: 2 },
-        { id: 'powerbank', label: 'Com lanternas e um carregador portátil já carregado', score: 3 }
+        { id: 'celular', label: 'A lanterna do celular', score: 0 },
+        { id: 'velas', label: 'Velas', score: 0 },
+        { id: 'lanterna', label: 'Uma lanterna, sem pilha reserva', score: 1 },
+        { id: 'powerbank', label: 'Lanternas e carregador portátil', score: 3 }
       ]
     },
     {
       id: 'q9', type: 'single', n: 9, hour: 27, pillar: 'dinheiro',
-      title: 'Se Pix e cartão parassem por 2 dias no seu bairro, quanto dinheiro vivo você tem em casa agora?',
-      help: 'Fique tranquilo: suas respostas não são enviadas nem guardadas por ninguém.',
+      title: 'Sem Pix e sem cartão, quanto dinheiro vivo você tem em casa?',
+      help: 'Ninguém vê suas respostas.',
       options: [
-        { id: 'd0', label: 'Nada', score: 0 },
-        { id: 'd1', label: 'Menos de R$ 50', score: 1 },
-        { id: 'd2', label: 'Entre R$ 50 e R$ 200', score: 2 },
-        { id: 'd3', label: 'Mais de R$ 200, em notas pequenas', score: 3 }
+        { id: 'd0', label: 'Nenhum', score: 0 },
+        { id: 'd1', label: 'Uns trocados', score: 0 },
+        { id: 'd2', label: 'Menos de R$ 100', score: 1 },
+        { id: 'd3', label: 'Uma reserva em notas pequenas', score: 3 }
       ]
     },
     {
       id: 'p3', type: 'proof', hour: 30,
-      kicker: 'Fora da simulação',
-      title: 'Não é filme. Já aconteceu aqui.',
+      kicker: 'Não é filme',
+      title: 'Já aconteceu aqui.',
       image: { key: 'prova3', alt: 'Bairro sem energia depois de um temporal', placeholder: 'Foto ou manchete dos apagões de SP e das enchentes do RS' },
       blocks: function () {
         return [
-          { kind: 'item', icon: '🔌', text: '**Novembro de 2023:** um temporal deixou cerca de 2 milhões de imóveis sem luz na Grande São Paulo, alguns por até 5 dias.' },
-          { kind: 'item', icon: '🔌', text: '**Outubro de 2024:** aconteceu de novo.' },
-          { kind: 'item', icon: '🌊', text: '**Maio de 2024:** as enchentes no Rio Grande do Sul deixaram cidades sem luz, sem água e sem acesso por semanas.' },
-          { kind: 'text', text: 'Nesses dias, quem não tinha nada guardado dependeu de fila, de mercado vazio e de preço alto.' },
-          { kind: 'source', text: 'Fonte: reportagens da época (2023 e 2024).' }
+          { kind: 'item', icon: '🔌', text: '**2023, São Paulo:** 2 milhões de imóveis sem luz, alguns por 5 dias' },
+          { kind: 'item', icon: '🔌', text: '**2024, São Paulo:** de novo' },
+          { kind: 'item', icon: '🌊', text: '**2024, Rio Grande do Sul:** cidades sem luz e sem água por semanas' }
         ];
       }
     },
+
+    /* ---------- AS DORES ---------- */
     {
       id: 'q10', type: 'single', n: 10, hour: 33, pillar: 'avisos',
-      title: 'Se a internet caísse, como você saberia de um alerta de temporal, de enchente ou da volta da luz?',
+      title: 'Sem internet e sem sinal, como você saberia o que está acontecendo?',
       options: [
-        { id: 'v0', label: 'Não teria como saber', score: 0 },
-        { id: 'v1', label: 'Pelo celular, enquanto tiver bateria e sinal', score: 1 },
-        { id: 'v2', label: 'Pelo SMS gratuito da Defesa Civil (40199)', score: 2 },
-        { id: 'v3', label: 'Pelo SMS da Defesa Civil e por um rádio a pilha', score: 3 }
+        { id: 'v0', label: 'Não saberia', score: 0 },
+        { id: 'v1', label: 'Esperaria o celular voltar', score: 0 },
+        { id: 'v2', label: 'Perguntaria aos vizinhos', score: 1 },
+        { id: 'v3', label: 'Rádio a pilha e alerta da Defesa Civil (40199)', score: 3 }
       ]
     },
     {
       id: 'q11', type: 'single', n: 11, hour: 37, pillar: 'saude',
-      title: 'Se as farmácias fechassem por 3 dias, vocês teriam os remédios do dia a dia e um kit de primeiros socorros?',
-      help: function (ctx) { return ctx.device ? 'Pense também em quem usa aparelho de saúde aí.' : ''; },
+      title: 'Como está seu kit de primeiros socorros?',
       options: [
-        { id: 's0', label: 'Não temos nenhum dos dois', score: 0 },
-        { id: 's1', label: 'Só alguns remédios, sem kit', score: 1 },
-        { id: 's2', label: 'Temos um pouco de cada', score: 2 },
-        { id: 's3', label: 'Sim, os dois, para mais de 3 dias', score: 3 }
+        { id: 's0', label: 'Não tenho', score: 0 },
+        { id: 's1', label: 'Nem sei o que tem dentro', score: 0 },
+        { id: 's2', label: 'Só uns remédios soltos', score: 1 },
+        { id: 's3', label: 'Completo, com remédios para vários dias', score: 3 }
       ]
     },
     {
       id: 'q12', type: 'single', n: 12, hour: 41, pillar: 'plano',
       title: function (ctx) {
         return ctx.solo
-          ? 'Se a luz e o celular caíssem, alguém sabe onde te procurar e como falar com você?'
-          : 'Se a luz e o celular caíssem com a família separada (trabalho, escola), vocês sabem onde se encontrar e quem busca quem?';
+          ? 'Se o celular parar, alguém sabe onde te encontrar?'
+          : 'Se o celular parar, sua família sabe onde se encontrar?';
       },
       options: [
-        { id: 'f0', label: 'Nunca combinamos nada', score: 0 },
-        { id: 'f1', label: 'Acho que sim, mas nunca conversamos', score: 1 },
-        { id: 'f2', label: 'Combinamos algo por alto', score: 2 },
+        {
+          id: 'f0', score: 0,
+          label: function (ctx) { return ctx.solo ? 'Não, ninguém' : 'Não, nunca falamos disso'; }
+        },
+        {
+          id: 'f1', score: 0,
+          label: function (ctx) { return ctx.solo ? 'Iam tentar me ligar' : 'Cada um ia tentar ligar'; }
+        },
+        {
+          id: 'f2', score: 1,
+          label: function (ctx) { return ctx.solo ? 'Iam vir até aqui e torcer' : 'Todo mundo ia para casa e torcer'; }
+        },
         {
           id: 'f3', score: 3,
-          label: function (ctx) {
-            return ctx.solo
-              ? 'Sim: tenho um contato combinado e alguém sabe onde me procurar'
-              : 'Sim: temos um ponto de encontro e um contato de fora da cidade';
-          }
+          label: function (ctx) { return ctx.solo ? 'Sim, tenho um contato combinado' : 'Sim, temos um ponto de encontro'; }
         }
       ]
     },
-
-    /* ---------- BLOCO I — IMPLICAÇÃO ---------- */
     {
       id: 'q13', type: 'multi', n: 13, hour: 46, min: 1,
-      title: 'Num apagão de 3 dias, quem dependeria de você?',
-      help: 'Marque tudo o que se aplica. Faltam só 8 perguntas.',
+      title: 'Quem depende de você?',
+      help: 'Marque tudo.',
       options: [
-        { id: 'criancas', label: 'Crianças pequenas' },
-        { id: 'idosos', label: 'Pais ou avós idosos' },
-        { id: 'remedio', label: 'Alguém com remédio de uso contínuo ou que vai na geladeira (como insulina)' },
-        { id: 'aparelho', label: 'Alguém que usa aparelho elétrico de saúde' },
+        { id: 'criancas', label: 'Crianças' },
+        { id: 'idosos', label: 'Idosos' },
+        { id: 'remedio', label: 'Quem toma remédio todo dia' },
+        { id: 'aparelho', label: 'Quem usa aparelho de saúde' },
         { id: 'gestante', label: 'Gestante' },
         { id: 'pet', label: 'Cachorro ou gato' },
-        { id: 'adultos', label: 'Só adultos, sem cuidados especiais', exclusive: true }
+        { id: 'adultos', label: 'Só adultos', exclusive: true }
       ]
     },
     {
       id: 'q14', type: 'single', n: 14, hour: 50,
-      title: 'Se a luz não voltasse até amanhã à noite, o que mais ia te preocupar?',
+      title: 'Se a luz não voltar, o que mais te assusta?',
       options: [
-        { id: 'comida', label: 'A comida estragando e não ter o que dar para a família' },
-        { id: 'agua', label: 'Ficar sem água para beber e para o banheiro' },
-        { id: 'contato', label: 'Não conseguir falar com a família nem saber notícias' },
-        { id: 'saude', label: 'Alguém aqui precisar de remédio, de cuidado ou de aparelho' },
+        { id: 'comida', label: 'Faltar comida' },
+        { id: 'agua', label: 'Faltar água' },
+        { id: 'contato', label: 'Ficar sem notícia da família' },
+        { id: 'saude', label: 'Alguém passar mal' },
         { id: 'sair', label: 'Ter que sair de casa às pressas' }
       ]
     },
     {
+      id: 'p4', type: 'proof', hour: 52,
+      kicker: 'Lembra?',
+      title: 'Ninguém sabe quanto tempo vai durar.',
+      image: { key: 'prova4', alt: 'Ruas vazias no início da quarentena', placeholder: 'Foto ou manchete do início da quarentena (2020)' },
+      blocks: function () {
+        return [{ kind: 'text', text: 'Na pandemia, a quarentena era para durar semanas. **Durou quase 2 anos.**' }];
+      }
+    },
+    {
       id: 'q15', type: 'single', n: 15, hour: 54,
-      title: 'E se, no segundo dia, você precisasse comprar água e comida com o mercado lotado e sem Pix?',
+      title: 'No 2º dia, mercado lotado e sem Pix. Como você compraria água e comida?',
       options: [
         { id: 'aperto', label: 'Ia passar aperto' },
         { id: 'preco', label: 'Ia pagar o preço que pedissem' },
         { id: 'vizinhos', label: 'Ia depender de vizinhos ou parentes' },
-        { id: 'tranquilo', label: 'Não precisaria: já tenho o que preciso em casa' }
+        { id: 'naosei', label: 'Não sei o que eu faria' }
       ]
     },
     {
       id: 'v1', type: 'video', hour: 56, video: 'vsl1', event: 'VSL1',
       kicker: 'Antes das últimas perguntas',
-      title: 'Por que as primeiras 72 horas são as mais difíceis',
-      help: 'Assista a este vídeo de 1 minuto.',
+      title: 'Por que os primeiros dias são os mais difíceis',
       placeholder: 'Mini VSL 1 · "O efeito dominó" (cerca de 70 s)',
       button: 'Continuar'
     },
 
-    /* ---------- BLOCO N — NECESSIDADE ---------- */
+    /* ---------- O QUE O LEAD QUER ---------- */
     {
       id: 'q16', type: 'single', n: 16, hour: 58,
-      title: 'Como você se sentiria sabendo que sua casa tem água, comida e luz para 3 dias, aconteça o que acontecer neste verão?',
-      help: 'Estamos quase no fim.',
+      title: 'Como seria saber que sua família está protegida, aconteça o que acontecer?',
       options: [
-        { id: 'alivio', label: 'Seria um alívio enorme' },
-        { id: 'quero', label: 'É exatamente o que eu quero para minha família' },
-        { id: 'ja', label: 'Eu já me sinto assim' }
+        { id: 'alivio', label: 'Um alívio enorme' },
+        { id: 'quero', label: 'É o que eu mais quero' },
+        { id: 'ja', label: 'Já me sinto assim' }
       ]
     },
     {
       id: 'q17', type: 'multi', n: 17, hour: 61,
-      title: 'Com a casa pronta, o que mudaria para você?',
-      help: 'Marque tudo o que se aplica.',
+      title: 'O que mudaria para você?',
+      help: 'Marque tudo.',
       options: [
-        { id: 'dormir', label: 'Dormir tranquilo em noite de temporal' },
-        { id: 'fila', label: 'Não depender de fila nem de preço alto' },
-        { id: 'proteger', label: 'Proteger as crianças, os idosos ou quem usa remédio' },
-        { id: 'ajudar', label: 'Poder ajudar pais, parentes e vizinhos' },
-        { id: 'saber', label: 'Saber exatamente o que fazer se a Defesa Civil mandar sair de casa' }
+        { id: 'dormir', label: 'Dormir tranquilo' },
+        { id: 'fila', label: 'Não depender de fila' },
+        { id: 'proteger', label: 'Proteger quem eu amo' },
+        { id: 'ajudar', label: 'Ajudar meus pais e vizinhos' },
+        { id: 'saber', label: 'Saber o que fazer na hora' }
       ]
     },
 
     /* ---------- OBJEÇÕES E COMPROMISSO ---------- */
     {
       id: 'q18', type: 'single', n: 18, hour: 64,
-      title: 'O que mais te impediu de preparar sua casa até hoje?',
+      title: 'O que te impediu de se preparar até hoje?',
       options: [
         { id: 'comecar', label: 'Não sei por onde começar' },
-        { id: 'caro', label: 'Achei que seria caro' },
-        { id: 'tempo', label: 'Não tenho tempo para organizar' },
+        { id: 'caro', label: 'Acho que é caro' },
+        { id: 'tempo', label: 'Falta tempo' },
         { id: 'nunca', label: 'Nunca achei que precisasse' }
       ]
     },
     {
       id: 'q19', type: 'single', n: 19, hour: 67,
-      lead: 'Na maioria das casas, o que falta não é dinheiro. É a ordem certa: primeiro água, depois comida, luz, dinheiro vivo e o combinado da família.',
+      lead: 'O que falta não é dinheiro. É saber a ordem certa.',
       title: 'Faz sentido para você?',
       options: [
         { id: 'sim', label: 'Sim, faz todo sentido' },
-        { id: 'medo', label: 'Faz sentido, mas tenho medo de gastar muito' },
+        { id: 'medo', label: 'Sim, mas tenho medo de gastar' },
         { id: 'novo', label: 'Nunca tinha pensado assim' }
       ]
     },
     {
       id: 'q20', type: 'single', n: 20, hour: 70,
-      title: 'Se você recebesse agora um passo a passo de 7 dias para deixar sua casa pronta, gastando pouco, você aplicaria?',
+      title: 'Se recebesse um passo a passo simples, gastando pouco, você aplicaria?',
       options: [
         { id: 'semana', label: 'Sim, começo esta semana' },
         { id: 'passo', label: 'Sim, um passo de cada vez' },
-        { id: 'ver', label: 'Quero ver primeiro como funciona' }
+        { id: 'ver', label: 'Sim, antes que seja tarde' }
       ]
     },
 
@@ -344,20 +347,17 @@
     {
       id: 'v2', type: 'loading', hour: 72, theme: 'day', video: 'vsl2', event: 'VSL2',
       interstitial: lightsBack,
-      title: 'Calculando seu Índice Família a Salvo…',
-      titleReady: 'Seu diagnóstico está pronto.',
+      title: 'Calculando sua avaliação…',
+      titleReady: 'Sua avaliação está pronta.',
       checklist: ['Água', 'Comida', 'Luz', 'Dinheiro', 'Avisos', 'Saúde', 'Plano'],
       summary: function (ctx) {
-        var answer = WATER_ANSWER_TEXT[ctx.answers.q6] || 'poucos dias';
-        var who = ctx.solo ? 'Para uma pessoa' : ctx.peopleIsMin ? 'Para 5 ou mais pessoas' : 'Para ' + ctx.people + ' pessoas';
-        var subject = ctx.solo ? 'Você respondeu que tem água para **' : 'Você respondeu que sua família tem água para **';
-        var pet = ctx.pet ? ' (já contando o pet)' : '';
-        return subject + answer + '**. ' + who + ', o mínimo é **' + ctx.litersLabel + ' litros**' + pet + '.';
+        var answer = WATER_ANSWER_TEXT[ctx.answers.q6] || 'pouca água';
+        return 'Você tem **' + answer + '**. Sua casa precisa de **' + ctx.litersLabel + ' litros** só para os 3 primeiros dias.';
       },
-      help: 'Enquanto calculamos, assista a este vídeo de 2 minutos. **Seu diagnóstico aparece logo abaixo quando ele terminar.**',
+      help: 'Assista enquanto calculamos.',
       placeholder: 'Mini VSL 2 · "Seu diagnóstico" (cerca de 2 min 20 s)',
-      waiting: 'O botão do seu diagnóstico aparece aqui quando o vídeo terminar.',
-      button: 'Ver meu diagnóstico'
+      waiting: 'O botão aparece quando o vídeo terminar.',
+      button: 'Ver minha avaliação'
     }
   ];
 
@@ -373,7 +373,7 @@
       have: 'Sua casa hoje: {n} pontos',
       gap: 'Com o Plano 72, sua família está a salvo.'
     },
-    perceptionLabels: { bem: 'bem preparada', mais: 'mais ou menos preparada', pouco: 'pouco preparada' },
+    perceptionLabels: { bem: 'pronta', mais: 'mais ou menos pronta', pouco: 'despreparada' },
     hours: {
       0: 'menos de 12 horas',
       1: 'cerca de 24 horas',

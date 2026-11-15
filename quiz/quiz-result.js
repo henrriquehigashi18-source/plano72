@@ -76,7 +76,7 @@
     return card(enough ? 'is-good' : 'is-hours', [
       el('h2', { text: 'Quanto tempo sua casa aguenta hoje' }),
       el('p', { class: 'res-big', text: copy.hours[diag.hoursKey] }),
-      el('p', { text: enough ? 'Em água e comida, sua casa já cobre as 72 horas recomendadas.' : 'A Defesa Civil recomenda pelo menos 72 horas.' }),
+      el('p', { text: enough ? 'Em água e comida, sua casa já cobre os primeiros dias.' : 'A Defesa Civil recomenda pelo menos 72 horas. E ninguém sabe quanto tempo vai durar.' }),
       el('p', { class: 'res-note', text: 'Estimativa pelas suas respostas sobre água e comida.' })
     ]);
   }

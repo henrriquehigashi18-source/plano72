@@ -104,7 +104,7 @@
     if (!isNight) return;
     var sim = L.simulation(step.hour);
     var progress = Math.round(state.idx / RESULT_IDX * 100);
-    hudHour.textContent = 'Hora ' + step.hour + ' de ' + L.SIMULATION_HOURS;
+    hudHour.textContent = 'Hora ' + step.hour;
     battFill.style.width = sim.battery + '%';
     battPct.textContent = sim.battery + '%';
     hudBatt.classList.toggle('is-low', sim.battery <= LOW_BATTERY);
@@ -129,7 +129,8 @@
     var node = el('section', { class: 'inter', on: { click: finish } }, [
       lamp,
       el('h1', { class: 'inter-title', tabindex: '-1', text: options.title }),
-      el('p', { class: 'inter-sub', text: options.sub })
+      el('p', { class: 'inter-sub', text: options.sub }),
+      el('button', { class: 'btn', type: 'button', text: 'Continuar' })
     ]);
     mount(node);
     if (options.lamp === 'on') later(function () { lamp.classList.remove('is-off'); }, LAMP_ON_DELAY_MS);
@@ -350,7 +351,7 @@
     return el('section', { class: 'card proof' }, [
       el('p', { class: 'kicker', text: step.kicker }),
       el('h1', { class: 'q-title', tabindex: '-1', text: step.title }),
-      el('p', { class: 'q-help', text: step.help }),
+      step.help ? el('p', { class: 'q-help', text: step.help }) : null,
       videoPlayer(step, function () { next.disabled = false; }),
       next
     ]);

@@ -82,13 +82,15 @@ strong,b{font-weight:800}
 .intro-list{list-style:none;margin-bottom:14px}
 .intro-list li{position:relative;padding-left:28px;margin-bottom:6px;font-size:15.5px;line-height:1.4}
 .intro-list li::before{content:"✓";position:absolute;left:2px;color:var(--green);font-weight:900}
-.intro-proof{background:var(--white);border-left:5px solid var(--amber);border-radius:12px;padding:11px 14px;font-size:14px;line-height:1.45;color:#3c4654;box-shadow:0 2px 10px rgba(18,38,58,.06)}
+.intro-proof{margin-top:18px;background:var(--white);border-left:5px solid var(--amber);border-radius:12px;padding:11px 14px;font-size:14px;line-height:1.45;color:#3c4654;box-shadow:0 2px 10px rgba(18,38,58,.06)}
 .intro .btn{margin-top:16px}
-.intro-micro{text-align:center;font-size:14px;color:var(--muted);margin-top:16px}
+.intro-micro{text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
+.intro .tag{line-height:1.35}
 
 /* ---------- transição: a luz acabou / a luz voltou ---------- */
 .inter{min-height:66dvh;display:flex;flex-direction:column;justify-content:center;text-align:center;cursor:pointer}
 .inter .lamp{margin-top:0}
+.inter .btn{max-width:320px;margin:28px auto 0}
 .inter-title{font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:10px}
 .inter-sub{font-size:16px;color:var(--muted);font-weight:600}
 .theme-night .inter-sub{color:var(--muted-n)}
@@ -133,7 +135,9 @@ strong,b{font-weight:800}
 .opt[aria-pressed="true"]{border-color:var(--amber);background:rgba(242,160,7,.14);color:#fff}
 .opt[aria-pressed="true"]::after{content:"✓";border-color:var(--amber);background:var(--amber);color:var(--navy);font-size:13px;font-weight:900;line-height:18px;text-align:center}
 
-.proof p{margin-top:13px;font-size:16.5px;color:#D9E2EC}
+.proof p{margin-top:13px;font-size:17px;color:#D9E2EC}
+/* Botão de avançar sempre visível: gruda no rodapé da tela enquanto o cartão for mais alto que ela. */
+.card > .btn,.card-day > .btn{position:sticky;bottom:calc(14px + env(safe-area-inset-bottom));z-index:2}
 .proof .kicker{margin-top:0}
 .proof strong{color:#fff}
 .proof-item{display:flex;gap:11px;align-items:flex-start}
@@ -142,8 +146,8 @@ strong,b{font-weight:800}
 .proof .proof-source{font-size:12.5px;color:var(--muted-n)}
 
 /* ---------- espaços reservados para imagem e vídeo ---------- */
-.media{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;margin-top:16px}
-.ph{margin-top:16px;aspect-ratio:16/9;border:2px dashed rgba(242,160,7,.55);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:16px;background:rgba(242,160,7,.05)}
+.media{width:100%;height:clamp(150px,34dvh,320px);object-fit:cover;border-radius:14px;margin-top:16px}
+.ph{margin-top:16px;width:100%;height:clamp(150px,34dvh,320px);border:2px dashed rgba(242,160,7,.55);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:16px;background:rgba(242,160,7,.05)}
 .ph-tag{font-size:11.5px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--amber-d)}
 .theme-night .ph-tag{color:var(--amber)}
 .ph-desc{font-size:14.5px;font-weight:600;color:var(--muted)}
