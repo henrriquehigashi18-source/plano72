@@ -320,6 +320,8 @@
     }
     track('trackCustom', step.event + 'View');
 
+    if (video.youtube) return youtubePlayer(step, video, unlock);
+
     if (!video.src) {
       later(unlock, cfg.placeholderUnlockSeconds * 1000);
       return cfg.showPlaceholders ? dom.placeholder('video', step.placeholder) : null;
@@ -344,6 +346,50 @@
     /* Começa mudo, como os navegadores exigem; se nem assim tocar, mostra os controles. */
     later(function () { player.play().catch(function () { player.controls = true; }); }, 0);
     return el('div', { class: 'video' }, [player, unmute]);
+  }
+
+  /* Vídeo hospedado no YouTube (não listado). Libera o botão quando o vídeo termina.
+     Se o vídeo falhar ao carregar, libera depois de unlockSeconds para não travar o quiz. */
+  var ytApiRequested = false;
+  var ytApiCallbacks = [];
+
+  function loadYouTubeApi(callback, onFail) {
+    if (window.YT && window.YT.Player) return callback();
+    ytApiCallbacks.push({ ok: callback, fail: onFail });
+    if (ytApiRequested) return;
+    ytApiRequested = true;
+    window.onYouTubeIframeAPIReady = function () {
+      ytApiCallbacks.splice(0).forEach(function (cb) { cb.ok(); });
+    };
+    var script = document.createElement('script');
+    script.src = 'https://www.youtube.com/iframe_api';
+    script.onerror = function () { ytApiCallbacks.splice(0).forEach(function (cb) { cb.fail(); }); };
+    document.head.appendChild(script);
+  }
+
+  function youtubePlayer(step, video, unlock) {
+    var holder = el('div', { class: 'video yt-holder' });
+    var target = el('div', { class: 'yt' });
+    holder.appendChild(target);
+    /* Só libera pelo tempo se o vídeo falhar: sem reprodução, o botão continua bloqueado. */
+    function fail() { later(unlock, video.unlockSeconds * 1000); }
+
+    loadYouTubeApi(function () {
+      new window.YT.Player(target, {
+        videoId: video.youtube,
+        playerVars: { playsinline: 1, rel: 0, modestbranding: 1 },
+        events: {
+          onStateChange: function (event) {
+            if (event.data === window.YT.PlayerState.ENDED) {
+              track('trackCustom', step.event + 'Complete');
+              unlock();
+            }
+          },
+          onError: fail
+        }
+      });
+    }, fail);
+    return holder;
   }
 
   function videoView(step) {

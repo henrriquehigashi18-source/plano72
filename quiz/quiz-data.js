@@ -26,7 +26,8 @@
     vsl1: { enabled: false, src: '', poster: '', unlockSeconds: 60 },
 
     /* MINI VSL 2 (final). src: arquivo .mp4 na pasta /quiz ou endereço completo do vídeo. */
-    vsl2: { src: '', poster: '', unlockSeconds: 150 },
+    /* youtube: ID do vídeo no YouTube (modo não listado). Se preenchido, tem prioridade sobre src. */
+    vsl2: { youtube: '4mjlV6YcjuI', src: '', poster: '', unlockSeconds: 150 },
 
     /* Enquanto não houver vídeo, o botão aparece depois deste tempo (em segundos). */
     placeholderUnlockSeconds: 5
