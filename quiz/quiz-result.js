@@ -47,130 +47,53 @@
   }
 
   function heroSection(diag, copy) {
-    var level = copy.levels[diag.level];
     return el('header', { class: 'res-hero level-' + diag.level }, [
-      el('p', { class: 'kicker', text: 'Seu diagnóstico' }),
       el('h1', { class: 'res-title', tabindex: '-1', text: 'Seu Índice Família a Salvo' }),
       gauge(diag.index, diag.level),
       gaugeLegend(diag.index, copy),
-      el('p', { class: 'res-level', text: level.title }),
-      el('p', { class: 'res-level-text', text: level.text })
+      el('p', { class: 'res-level', text: copy.levels[diag.level] })
     ]);
-  }
-
-  function perceptionSection(ctx, diag, copy) {
-    var label = copy.perceptionLabels[ctx.answers.q1];
-    if (diag.overestimated && label) {
-      return card('is-alert', [
-        el('p', { rich: 'Você achava que sua casa estava **' + label + '**. Suas respostas mostram **' + diag.index + ' de 100**.' })
-      ]);
-    }
-    if (diag.underestimated) {
-      return card('is-good', [el('p', { text: 'Boa notícia: sua casa está melhor do que você imaginava.' })]);
-    }
-    return null;
   }
 
   function hoursSection(diag, copy) {
     var enough = diag.hoursKey === 3;
     return card(enough ? 'is-good' : 'is-hours', [
-      el('h2', { text: 'Quanto tempo sua casa aguenta hoje' }),
+      el('h2', { text: 'Sua casa aguenta hoje' }),
       el('p', { class: 'res-big', text: copy.hours[diag.hoursKey] }),
-      el('p', { text: enough ? 'Em água e comida, sua casa já cobre os primeiros dias.' : 'A Defesa Civil recomenda pelo menos 72 horas. E ninguém sabe quanto tempo vai durar.' }),
-      el('p', { class: 'res-note', text: 'Estimativa pelas suas respostas sobre água e comida.' })
+      el('p', { text: enough ? copy.hoursOk : copy.hoursNote })
     ]);
   }
 
-  function gapsSection(ctx, diag, copy) {
+  function gapsSection(diag, copy) {
     if (diag.gaps.length === 0) {
-      return card('', [el('h2', { text: 'Seus pontos fracos' }), el('p', { text: copy.noGaps })]);
+      return card('', [el('h2', { text: copy.noGaps })]);
     }
     var items = diag.gaps.map(function (pillar, position) {
       var info = copy.pillars[pillar];
       return el('li', { class: 'gap' }, [
         el('span', { class: 'gap-n', 'aria-hidden': 'true', text: String(position + 1) }),
         el('div', {}, [
-          el('b', { text: info.name }),
-          el('p', { text: info.text(ctx) }),
-          el('p', { class: 'gap-chapter', text: 'No guia: ' + info.chapter })
+          el('b', { text: info.title }),
+          el('p', { class: 'gap-chapter', text: 'O guia resolve no ' + info.chapter })
         ])
       ]);
     });
-    var title = diag.gaps.length === 1 ? 'Seu ponto fraco' : 'Seus ' + diag.gaps.length + ' maiores pontos fracos';
+    var title = diag.gaps.length === 1 ? 'Seu ponto fraco' : 'Seus ' + diag.gaps.length + ' pontos fracos';
     return card('', [el('h2', { text: title }), el('ol', { class: 'gap-list' }, items)]);
   }
 
-  function candleSection(ctx, copy) {
-    if (ctx.answers.q8 !== 'velas') return null;
-    return card('is-alert', [el('p', { text: copy.candleWarning })]);
-  }
-
-  function attentionSection(ctx, copy) {
-    var chosen = (ctx.answers.q13 || []).filter(function (id) { return copy.attention[id]; });
-    if (chosen.length === 0) return null;
-    return card('', [
-      el('h2', { text: 'Atenção extra na sua casa' }),
-      el('ul', { class: 'res-list' }, chosen.map(function (id) { return el('li', { text: copy.attention[id] }); }))
-    ]);
-  }
-
-  function scenarioSection(ctx, copy) {
-    var worry = copy.worries[ctx.answers.q14];
-    var children = [el('h2', { text: 'O seu cenário' })];
-    if (worry) {
-      children.push(el('p', { rich: 'O que mais te preocupa: **' + worry.text + '**. ' + worry.chapter }));
-    }
-    children.push(el('p', { text: copy.regions[ctx.region] }));
-    return card('', children);
-  }
-
-  function wantsSection(ctx, copy) {
-    var chosen = (ctx.answers.q17 || []).filter(function (id) { return copy.wants[id]; });
-    if (chosen.length === 0) return null;
-    return card('', [
-      el('h2', { text: 'O que você disse que quer' }),
-      el('ul', { class: 'res-list is-check' }, chosen.map(function (id) { return el('li', { text: copy.wants[id] }); }))
-    ]);
-  }
-
-  function tipSection(ctx, copy) {
-    var alreadyUsesSms = (ctx.scores.avisos || 0) >= 2;
-    if (alreadyUsesSms) return null;
-    return card('is-tip', [el('h2', { text: 'Dica grátis, para fazer agora' }), el('p', { rich: copy.tip })]);
-  }
-
-  function objectionSection(ctx, copy) {
-    var main = copy.objections[ctx.answers.q18];
-    var fear = ctx.answers.q19 === 'medo' && ctx.answers.q18 !== 'caro' ? copy.fearOfCost : null;
-    if (!main && !fear) return null;
-    return el('div', { class: 'res-objection' }, [main ? el('p', { text: main }) : null, fear ? el('p', { text: fear }) : null]);
-  }
-
-  function offerSection(diag, copy, options) {
-    var kicker = diag.gaps.length === 0 ? copy.offerKickers.maintenance : copy.offerKickers.gaps;
-    var chapters = copy.chapters.map(function (title, index) {
-      var number = index + 1 < 10 ? '0' + (index + 1) : String(index + 1);
-      return el('li', {}, [el('span', { text: number }), title]);
-    });
+  function offerSection(copy, options) {
+    var offer = copy.offer;
     return el('section', { class: 'offer', id: 'oferta' }, [
       el('img', { class: 'offer-cover', src: options.coverSrc, alt: 'Capa do guia Plano 72 · Família a Salvo', width: '240', height: '340' }),
-      el('p', { class: 'kicker', text: kicker }),
-      el('h2', { text: 'Plano 72 · Família a Salvo' }),
-      el('p', { text: 'Guia prático, baseado nas orientações da Defesa Civil, com as quantidades certas, o checklist e o plano de 7 dias. Sem gastar uma fortuna e sem virar "prepper".' }),
-      el('details', { class: 'offer-chapters' }, [
-        el('summary', { text: 'Ver os 14 capítulos' }),
-        el('ol', {}, chapters)
-      ]),
-      el('p', { class: 'offer-price' }, [el('span', { text: 'Hoje por' }), el('b', { text: options.price })]),
+      el('h2', { text: offer.title }),
+      el('p', { text: offer.line }),
+      el('p', { class: 'offer-price' }, [el('b', { text: options.price })]),
       el('a', { class: 'btn', href: options.checkoutHref, on: { click: options.onCheckout } }, [
-        'Quero meu Plano 72',
-        el('small', { text: 'Acesso imediato · garantia de 7 dias' })
+        offer.button,
+        el('small', { text: offer.small })
       ])
     ]);
-  }
-
-  function shortcut() {
-    return el('a', { class: 'res-shortcut', href: '#oferta', text: 'Ver como resolver isso ↓' });
   }
 
   /* Barra fixa de compra: aparece depois do índice e some quando a oferta está na tela. */
@@ -189,25 +112,17 @@
   }
 
   /*
-    ctx: contexto das respostas (QuizLogic.derive)
+    ctx: contexto das respostas (QuizLogic.derive), reservado para textos personalizados
     diag: resultado do cálculo (QuizLogic.diagnose)
     options: { coverSrc, price, checkoutHref, onCheckout, onRestart }
   */
   function render(ctx, diag, copy, options) {
     var hero = heroSection(diag, copy);
-    var offer = offerSection(diag, copy, options);
+    var offer = offerSection(copy, options);
     return el('article', { class: 'res' }, [
       hero,
-      perceptionSection(ctx, diag, copy),
       hoursSection(diag, copy),
-      gapsSection(ctx, diag, copy),
-      diag.gaps.length > 0 ? shortcut() : null,
-      candleSection(ctx, copy),
-      attentionSection(ctx, copy),
-      scenarioSection(ctx, copy),
-      wantsSection(ctx, copy),
-      tipSection(ctx, copy),
-      objectionSection(ctx, copy),
+      gapsSection(diag, copy),
       offer,
       el('button', { class: 'res-restart', type: 'button', text: 'Refazer o teste', on: { click: options.onRestart } }),
       stickyBar(options, hero, offer)

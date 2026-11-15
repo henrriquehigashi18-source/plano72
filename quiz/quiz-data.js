@@ -363,116 +363,42 @@
 
   /* ---------- TEXTOS DA TELA DE RESULTADO ---------- */
   var result = {
+    /* Selo que aparece abaixo do medidor. */
     levels: {
-      1: { title: 'Família exposta', text: 'Hoje sua casa depende quase totalmente de luz, água e Pix funcionando.' },
-      2: { title: 'Família parcialmente protegida', text: 'Sua casa já tem alguns recursos, mas ainda há lacunas que pesam em 72 horas.' },
-      3: { title: 'Família bem encaminhada', text: 'Sua casa está à frente da maioria. Falta revisar a manutenção, a mochila de saída e o plano da família.' }
+      1: 'Família exposta',
+      2: 'Família parcialmente protegida',
+      3: 'Família bem encaminhada'
     },
     /* Legenda do medidor. {n} = pontos da casa hoje. */
     gauge: {
       have: 'Sua casa hoje: {n} pontos',
       gap: 'Com o Plano 72, sua família está a salvo.'
     },
-    perceptionLabels: { bem: 'pronta', mais: 'mais ou menos pronta', pouco: 'despreparada' },
     hours: {
       0: 'menos de 12 horas',
       1: 'cerca de 24 horas',
       2: 'cerca de 48 horas',
       3: '72 horas ou mais'
     },
+    hoursNote: 'O mínimo recomendado é 72 horas. E pode durar muito mais.',
+    hoursOk: 'Você cobre o mínimo. E se durar mais?',
+    /* Pontos fracos: um título que já diz o problema e onde o guia resolve. */
     pillars: {
-      agua: {
-        name: 'Água', chapter: 'Capítulo 03 · Água: o item que mais importa',
-        text: function (ctx) { return 'Há menos água guardada do que os ' + ctx.litersLabel + ' litros que a casa precisa para 72 horas.'; }
-      },
-      comida: {
-        name: 'Comida', chapter: 'Capítulo 04 · Comida para 3 dias sem geladeira e sem fogão',
-        text: function () { return 'Sem geladeira e sem fogão, a comida de casa não dura 3 dias.'; }
-      },
-      energia: {
-        name: 'Luz e celular', chapter: 'Capítulo 05 · Luz, energia e celular carregado',
-        text: function () { return 'Sem lanterna e carregador reserva, o celular vira a única luz e descarrega mais rápido.'; }
-      },
-      dinheiro: {
-        name: 'Dinheiro vivo', chapter: 'Capítulo 06 · Dinheiro e documentos quando o banco para',
-        text: function () { return 'Sem Pix e sem cartão, quem não tem dinheiro em espécie não consegue comprar.'; }
-      },
-      avisos: {
-        name: 'Avisos', chapter: 'Capítulos 05 e 14 · Celular carregado e contatos de emergência',
-        text: function () { return 'Sem internet, a casa fica sem saber de alertas e da volta da luz.'; }
-      },
-      saude: {
-        name: 'Saúde', chapter: 'Capítulo 07 · Saúde, remédios e higiene',
-        text: function () { return 'Faltam remédios do dia a dia e primeiros socorros para 3 dias.'; }
-      },
-      plano: {
-        name: 'Plano da família', chapter: 'Capítulo 08 · Plano da família: quem faz o quê',
-        text: function (ctx) {
-          return ctx.solo
-            ? 'Ninguém combinou onde te procurar se o celular cair.'
-            : 'Não há um ponto de encontro combinado se o celular cair.';
-        }
-      }
+      agua: { title: 'Falta água guardada', chapter: 'capítulo 03' },
+      comida: { title: 'Falta comida que dure sem geladeira', chapter: 'capítulo 04' },
+      energia: { title: 'Falta luz e carga para o celular', chapter: 'capítulo 05' },
+      dinheiro: { title: 'Falta dinheiro vivo em casa', chapter: 'capítulo 06' },
+      avisos: { title: 'Sem como receber alertas', chapter: 'capítulos 05 e 14' },
+      saude: { title: 'Falta kit de saúde', chapter: 'capítulo 07' },
+      plano: { title: 'Família sem ponto de encontro', chapter: 'capítulo 08' }
     },
-    offerKickers: {
-      gaps: 'O passo a passo para fechar essas lacunas',
-      maintenance: 'Para revisar e manter sua casa em dia'
-    },
-    noGaps: 'Nenhuma lacuna grave nos 7 pontos básicos. O que resta é manutenção: validade da água e da comida, pilhas e a mochila de saída.',
-    candleWarning: 'Você marcou velas. Vela acesa no escuro traz risco de incêndio, principalmente com criança e pet em casa. Lanterna é mais segura.',
-    attention: {
-      criancas: 'Crianças pequenas: água, comida que elas aceitam e algo para distrair no escuro.',
-      idosos: 'Idosos: remédios para vários dias e atenção redobrada ao calor.',
-      remedio: 'Remédio de uso contínuo ou de geladeira: precisa de um plano para conservar e repor.',
-      aparelho: 'Aparelho elétrico de saúde: precisa de um plano B de energia.',
-      gestante: 'Gestante: água extra, documentos do pré-natal à mão e o caminho até a maternidade combinado.',
-      pet: 'Pet: some 1 litro de água por dia e ração para 3 dias.'
-    },
-    worries: {
-      comida: { text: 'a comida estragando', chapter: 'O capítulo 04 mostra o que comprar e a ordem certa de consumo quando a luz acaba.' },
-      agua: { text: 'ficar sem água', chapter: 'O capítulo 03 mostra quanto guardar, como armazenar e como tratar a água.' },
-      contato: { text: 'ficar sem contato com a família', chapter: 'Os capítulos 05 e 08 tratam do celular carregado e do combinado da família.' },
-      saude: { text: 'alguém precisar de cuidado', chapter: 'O capítulo 07 trata de remédios, primeiros socorros e higiene.' },
-      sair: { text: 'ter que sair de casa às pressas', chapter: 'O capítulo 11 mostra a mochila de saída rápida, pronta para pegar e sair.' }
-    },
-    regions: {
-      sul: 'No Sul, a previsão é de chuva acima do normal. O capítulo 10 (Enchente e temporal) mostra o que fazer antes, durante e depois.',
-      sudeste: 'No Sudeste, a previsão é de calor e temporais de verão. Os capítulos 09 (Seca e calor extremo) e 10 (Enchente e temporal) cobrem os dois cenários.',
-      co: 'No Centro-Oeste, a previsão é de calor e temporais de verão. Os capítulos 09 (Seca e calor extremo) e 10 (Enchente e temporal) cobrem os dois cenários.',
-      norte: 'No Norte, a previsão é de chuva abaixo do normal e calor forte. O capítulo 09 (Seca e calor extremo) é o seu ponto de partida.',
-      nordeste: 'No Nordeste, a previsão é de chuva abaixo do normal e calor forte. O capítulo 09 (Seca e calor extremo) é o seu ponto de partida.'
-    },
-    wants: {
-      dormir: 'Dormir tranquilo em noite de temporal',
-      fila: 'Não depender de fila nem de preço alto',
-      proteger: 'Proteger as crianças, os idosos ou quem usa remédio',
-      ajudar: 'Poder ajudar pais, parentes e vizinhos',
-      saber: 'Saber exatamente o que fazer se a Defesa Civil mandar sair de casa'
-    },
-    tip: 'Mande um SMS para **40199** com o CEP da sua casa. Você passa a receber os alertas da Defesa Civil de graça.',
-    objections: {
-      comecar: 'Você disse que não sabe por onde começar. O guia abre com um diagnóstico de 10 minutos e mostra a ordem certa.',
-      caro: 'Você disse que achava caro. O plano de 7 dias começa pelo que é grátis, e vários passos não custam nada.',
-      tempo: 'Você disse que falta tempo. São 30 minutos de leitura e um passo por dia, durante 7 dias.',
-      nunca: 'Você disse que nunca achou que precisasse. O melhor momento para se preparar é antes de precisar.'
-    },
-    fearOfCost: 'Sobre o medo de gastar: o plano de 7 dias começa pelo que é grátis.',
-    chapters: [
-      'Por que 72 horas',
-      'Diagnóstico da sua casa em 10 minutos',
-      'Água: o item que mais importa',
-      'Comida para 3 dias sem geladeira e sem fogão',
-      'Luz, energia e celular carregado',
-      'Dinheiro e documentos quando o banco para',
-      'Saúde, remédios e higiene',
-      'Plano da família: quem faz o quê',
-      'Seca e calor extremo',
-      'Enchente e temporal',
-      'Mochila de saída rápida',
-      'Monte tudo em 7 dias sem estourar o orçamento',
-      'Checklist final e manutenção',
-      'Números e contatos de emergência'
-    ]
+    noGaps: 'Sua casa cobre o básico. O guia ajuda a manter tudo em dia.',
+    offer: {
+      title: 'Plano 72 · Família a Salvo',
+      line: 'O passo a passo para fechar essas lacunas, gastando pouco.',
+      button: 'Quero meu Plano 72',
+      small: 'Acesso imediato · garantia de 7 dias'
+    }
   };
 
   root.QuizData = { config: config, blackout: blackout, steps: steps, result: result };
