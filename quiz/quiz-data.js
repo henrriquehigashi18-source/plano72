@@ -11,14 +11,21 @@
     price: 'R$ 27',
 
     /* true = mostra uma caixa tracejada onde ainda falta imagem ou vídeo. Mude para false para esconder. */
-    showPlaceholders: true,
+    showPlaceholders: false,
 
     /* IMAGENS: coloque o arquivo na pasta /quiz e escreva o nome aqui. Ex.: 'prova-regiao.jpg' */
     images: {
-      prova1: '',
-      prova2: '',
-      prova3: '',
-      prova4: '',
+      /* Prova 1: uma foto para cada região da previsão. */
+      prova1: {
+        sul: { file: 'img/prova1-sul.jpg', alt: 'Torres de energia dentro da água em enchente no Rio Grande do Sul', credit: 'Enchente no RS, 2015 · foto de Ricardo André Frantz (CC BY 3.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:Enchentes_de_2015_no_Rio_Grande_do_Sul_4.jpg' },
+        sudeste: { file: 'img/prova1-sudeste.jpg', alt: 'Raios sobre prédios de Belo Horizonte durante uma tempestade', credit: 'Tempestade em Belo Horizonte · foto de Marcin Wichary (CC BY 2.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:Tempestade_BH.jpg' },
+        co: { file: 'img/prova1-sudeste.jpg', alt: 'Raios sobre prédios de Belo Horizonte durante uma tempestade', credit: 'Tempestade em Belo Horizonte · foto de Marcin Wichary (CC BY 2.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:Tempestade_BH.jpg' },
+        norte: { file: 'img/prova1-norte.jpg', alt: 'Leito seco e rachado do Rio Negro durante a seca', credit: 'Seca no Rio Negro (AM), 2010 · foto de Alexandre Inagaki (CC BY 2.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:Seca_no_Rio_Negro_em_2010.jpg' },
+        nordeste: { file: 'img/prova1-nordeste.jpg', alt: 'Açude quase seco no Nordeste', credit: 'Açude Coremas (PB), 2017 · foto de AndersonPv (CC0)', source: 'https://commons.wikimedia.org/wiki/File:A%C3%A7ude_Coremas_(Fevereiro_de_2017).jpg' }
+      },
+      prova2: { file: 'img/prova2-galoes.jpg', alt: 'Fileira de galões de água de 20 litros empilhados na calçada', credit: 'Foto de DWatdonSHAM (domínio público)', source: 'https://commons.wikimedia.org/wiki/File:1989_HK_Sheung_Wan_Bonham_Strand_VITA_Distilled_Water.jpg' },
+      prova3: { file: 'img/prova3-pelotas.jpg', alt: 'Rua alagada em Pelotas, no Rio Grande do Sul, em 2024', credit: 'Pelotas (RS), 2024 · foto de Myke Sena/DPU (CC0)', source: 'https://commons.wikimedia.org/wiki/File:Enchentes_causam_estragos_em_bairros_de_Pelotas_-_Rio_Grande_do_Sul_(53831637059).jpg' },
+      prova4: { file: 'img/prova4-paulista.jpg', alt: 'Avenida Paulista, em São Paulo, vazia durante a quarentena de 2020', credit: 'Avenida Paulista, São Paulo, 2020 · foto do Governo do Estado de São Paulo (CC BY 2.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:S%C3%A3o_Paulo_em_quarentena_(49930766156).jpg' },
       capa: '../capa.png'
     },
 
@@ -88,7 +95,7 @@
       id: 'p1', type: 'proof', hour: 3,
       kicker: 'Previsão para a sua região',
       title: function (ctx) { return REGION_NAMES[ctx.region] + ': ' + REGION_PROOF[ctx.region].title; },
-      image: { key: 'prova1', alt: 'Previsão do El Niño para a sua região', placeholder: 'Mapa ou ilustração da previsão para a região' },
+      image: { key: 'prova1', byRegion: true, alt: 'Previsão para a sua região', placeholder: 'Foto da região' },
       blocks: function (ctx) {
         return [
           { kind: 'text', text: REGION_PROOF[ctx.region].line },
@@ -267,7 +274,7 @@
       id: 'p4', type: 'proof', hour: 52,
       kicker: 'Lembra?',
       title: 'Ninguém sabe quanto tempo vai durar.',
-      image: { key: 'prova4', alt: 'Ruas vazias no início da quarentena', placeholder: 'Foto ou manchete do início da quarentena (2020)' },
+      image: { key: 'prova4', alt: 'Avenida Paulista vazia durante a quarentena', placeholder: 'Foto de um lugar vazio na quarentena' },
       blocks: function () {
         return [{ kind: 'text', text: 'Na pandemia, a quarentena era para durar semanas. **Durou quase 2 anos.**' }];
       }

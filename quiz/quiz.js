@@ -297,13 +297,23 @@
     return el('p', { rich: block.text });
   }
 
-  function proofView(step, ctx) {
+  /* Foto da prova: um arquivo único ou, na prova 1, um por região. */
+  function proofImage(step, ctx) {
     var image = step.image;
+    var entry = cfg.images[image.key];
+    if (entry && image.byRegion) entry = entry[ctx.region];
+    var file = entry && entry.file;
+    var credit = file && entry.credit
+      ? el('p', { class: 'proof-credit' }, [el('a', { href: entry.source, target: '_blank', rel: 'noopener noreferrer', text: entry.credit })])
+      : null;
+    return [dom.media(file, (entry && entry.alt) || image.alt, image.placeholder, cfg.showPlaceholders), credit];
+  }
+
+  function proofView(step, ctx) {
     return el('section', { class: 'card proof' }, [
       el('p', { class: 'kicker', text: step.kicker }),
-      el('h1', { class: 'q-title', tabindex: '-1', text: resolve(step.title, ctx) }),
-      dom.media(cfg.images[image.key], image.alt, image.placeholder, cfg.showPlaceholders)
-    ].concat(step.blocks(ctx).map(proofBlock), [
+      el('h1', { class: 'q-title', tabindex: '-1', text: resolve(step.title, ctx) })
+    ].concat(proofImage(step, ctx), step.blocks(ctx).map(proofBlock), [
       el('button', { class: 'btn', type: 'button', text: 'Continuar', on: { click: advance } })
     ]));
   }

@@ -63,7 +63,7 @@
 
   /* Imagem real quando houver arquivo; placeholder (se ligado) quando não houver. */
   function media(src, alt, description, showPlaceholders) {
-    if (src) return el('img', { class: 'media', src: src, alt: alt, loading: 'lazy', decoding: 'async' });
+    if (src) return el('img', { class: 'media', src: src, alt: alt, width: '1200', height: '750', decoding: 'async' });
     return showPlaceholders ? placeholder('image', description) : null;
   }
 
