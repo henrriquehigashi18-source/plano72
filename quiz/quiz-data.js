@@ -25,7 +25,7 @@
       },
       prova2: { file: 'img/prova2-galoes.jpg', alt: 'Fileira de galões de água de 20 litros empilhados na calçada', credit: 'Foto de DWatdonSHAM (domínio público)', source: 'https://commons.wikimedia.org/wiki/File:1989_HK_Sheung_Wan_Bonham_Strand_VITA_Distilled_Water.jpg' },
       prova3: { file: 'img/prova3-pelotas.jpg', alt: 'Rua alagada em Pelotas, no Rio Grande do Sul, em 2024', credit: 'Pelotas (RS), 2024 · foto de Myke Sena/DPU (CC0)', source: 'https://commons.wikimedia.org/wiki/File:Enchentes_causam_estragos_em_bairros_de_Pelotas_-_Rio_Grande_do_Sul_(53831637059).jpg' },
-      prova4: { file: 'img/prova4-paulista.jpg', alt: 'Avenida Paulista, em São Paulo, vazia durante a quarentena de 2020', credit: 'Avenida Paulista, São Paulo, 2020 · foto do Governo do Estado de São Paulo (CC BY 2.0), adaptada', source: 'https://commons.wikimedia.org/wiki/File:S%C3%A3o_Paulo_em_quarentena_(49930766156).jpg' },
+      prova4: { file: '../capa.png', alt: 'Capa do guia Plano 72 · Família a Salvo' },
       capa: '../capa.png'
     },
 
@@ -45,7 +45,7 @@
   /* Prova 1: um título que já diz tudo e uma linha de apoio. */
   var REGION_PROOF = {
     sul: { title: 'chuva forte prevista até janeiro', line: 'Temporal derruba a rede e deixa bairros sem luz e sem água por dias.' },
-    sudeste: { title: 'calor e temporais previstos', line: 'Em São Paulo, temporais já deixaram milhões sem luz por dias.' },
+    sudeste: { title: 'calor e temporais previstos', line: 'Temporal derruba a rede, e o calor sobrecarrega a energia.' },
     co: { title: 'calor e temporais previstos', line: 'Temporal derruba a rede, e o calor sobrecarrega a energia.' },
     norte: { title: 'seca e calor previstos', line: 'A seca pode levar a racionamento de água, e o calor sobrecarrega a rede.' },
     nordeste: { title: 'seca e calor previstos', line: 'A seca pode levar a racionamento de água, e o calor sobrecarrega a rede.' }
@@ -186,18 +186,16 @@
     },
     {
       id: 'p3', type: 'proof', hour: 30,
-      kicker: 'Não é filme',
-      title: 'Já aconteceu aqui.',
-      image: { key: 'prova3', alt: 'Bairro sem energia depois de um temporal', placeholder: 'Foto ou manchete dos apagões de SP e das enchentes do RS' },
+      kicker: 'Recomendação oficial',
+      title: 'A Defesa Civil recomenda: um kit para 72 horas.',
+      image: { key: 'prova3', alt: 'Rua alagada em Pelotas, no Rio Grande do Sul, em 2024', placeholder: 'Foto de rua alagada' },
       blocks: function () {
         return [
-          { kind: 'item', icon: '🔌', text: '**2023, São Paulo:** 2 milhões de imóveis sem luz, alguns por 5 dias' },
-          { kind: 'item', icon: '🔌', text: '**2024, São Paulo:** de novo' },
-          { kind: 'item', icon: '🌊', text: '**2024, Rio Grande do Sul:** cidades sem luz e sem água por semanas' }
+          { kind: 'text', text: '**72 horas** é o mínimo que a sua casa precisa aguentar sozinha. E a conta começa pela água: **2 litros por pessoa, por dia.**' },
+          { kind: 'source', text: 'Fonte: Defesa Civil Nacional, campanha de novembro de 2026.' }
         ];
       }
     },
-
     /* ---------- AS DORES ---------- */
     {
       id: 'q10', type: 'single', n: 10, hour: 33, pillar: 'avisos',
@@ -272,11 +270,16 @@
     },
     {
       id: 'p4', type: 'proof', hour: 52,
-      kicker: 'Lembra?',
-      title: 'Ninguém sabe quanto tempo vai durar.',
-      image: { key: 'prova4', alt: 'Avenida Paulista vazia durante a quarentena', placeholder: 'Foto de um lugar vazio na quarentena' },
+      kicker: 'O jeito simples',
+      title: 'Não precisa comprar tudo de uma vez.',
+      image: { key: 'prova4', alt: 'Capa do guia Plano 72 · Família a Salvo', placeholder: 'Capa do guia' },
       blocks: function () {
-        return [{ kind: 'text', text: 'Na pandemia, a quarentena era para durar semanas. **Durou quase 2 anos.**' }];
+        return [
+          { kind: 'item', icon: '✅', text: '**Dia 1:** conferir o que você já tem. De graça.' },
+          { kind: 'item', icon: '💧', text: '**Dia 2:** a água da família.' },
+          { kind: 'item', icon: '🛒', text: '**Dia 4:** a comida vai junto com o mercado do mês.' },
+          { kind: 'text', text: 'Uma tarefa por dia. Em **7 dias**, a casa pronta.' }
+        ];
       }
     },
     {
