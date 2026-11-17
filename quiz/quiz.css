@@ -82,7 +82,6 @@ strong,b{font-weight:800}
 .intro-list{list-style:none;margin-bottom:14px}
 .intro-list li{position:relative;padding-left:28px;margin-bottom:6px;font-size:15.5px;line-height:1.4}
 .intro-list li::before{content:"✓";position:absolute;left:2px;color:var(--green);font-weight:900}
-.intro-proof{margin-top:18px;background:var(--white);border-left:5px solid var(--amber);border-radius:12px;padding:11px 14px;font-size:14px;line-height:1.45;color:#3c4654;box-shadow:0 2px 10px rgba(18,38,58,.06)}
 .intro .btn{margin-top:16px}
 .intro-micro{text-align:center;font-size:14px;color:var(--muted);margin-top:12px}
 .intro .tag{line-height:1.35}
