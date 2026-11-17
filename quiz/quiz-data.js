@@ -32,9 +32,17 @@
     /* MINI VSL 1 (opcional, no meio do quiz). enabled: true liga para todos; ?vsl1=1 na URL liga só para testar. */
     vsl1: { enabled: false, src: '', poster: '', unlockSeconds: 60 },
 
-    /* MINI VSL 2 (final). src: arquivo .mp4 na pasta /quiz ou endereço completo do vídeo. */
-    /* youtube: ID do vídeo no YouTube (modo não listado). Se preenchido, tem prioridade sobre src. */
-    vsl2: { youtube: '4mjlV6YcjuI', src: '', poster: '', unlockSeconds: 150 },
+    /* MINI VSL 2 (final). Ordem de prioridade: bunny > youtube > src. Para voltar ao YouTube, apague a linha do bunny.
+       bunny: vídeo no Bunny Stream. No endereço https://player.mediadelivery.net/play/811679/GUID,
+              811679 é a "library" e o resto é o "id". Esconder a barra de progresso e os controles
+              é ajuste do painel do Bunny (Stream > biblioteca > Player settings), não daqui.
+       youtube: ID do vídeo no YouTube (modo não listado).
+       src: arquivo .mp4 na pasta /quiz ou endereço completo do vídeo. */
+    vsl2: {
+      bunny: { library: '811679', id: 'c4e5aa62-7974-4010-8907-adf8299fb06b' },
+      youtube: '4mjlV6YcjuI',
+      src: '', poster: '', unlockSeconds: 150
+    },
 
     /* Enquanto não houver vídeo, o botão aparece depois deste tempo (em segundos). */
     placeholderUnlockSeconds: 5

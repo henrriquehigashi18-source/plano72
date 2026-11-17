@@ -330,6 +330,8 @@
     }
     track('trackCustom', step.event + 'View');
 
+    if (video.bunny) return bunnyPlayer(step, video, unlock);
+
     if (video.youtube) return youtubePlayer(step, video, unlock);
 
     if (!video.src) {
@@ -400,6 +402,81 @@
       });
     }, fail);
     return holder;
+  }
+
+  /* Vídeo no Bunny Stream. O player fica dentro de um iframe e conversa com a página por postMessage
+     (protocolo player.js): assinamos "timeupdate" e "ended" para marcar a conclusão e liberar o botão.
+     A capa por cima começa o vídeo com som no primeiro toque, porque o navegador só libera som com
+     um gesto do visitante. Se o player não responder nada, libera por tempo para o quiz nunca travar. */
+  var PLAYER_JS_CONTEXT = 'player.js';
+  var PLAYER_JS_VERSION = '0.0.11';
+  var WATCHED_ENOUGH = 0.95;
+
+  function bunnyPlayer(step, video, unlock) {
+    var frame = el('iframe', {
+      class: 'bn',
+      src: 'https://player.mediadelivery.net/embed/' + video.bunny.library + '/' + video.bunny.id +
+        '?autoplay=true&muted=true&loop=false&preload=true&responsive=true',
+      title: 'Vídeo do Plano 72',
+      allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen'
+    });
+    var cover = el('button', { class: 'video-cover', type: 'button' }, [
+      el('span', { text: '🔊 Toque para ouvir' })
+    ]);
+    var heard = false;
+    var done = false;
+
+    function send(method, value) {
+      var message = { context: PLAYER_JS_CONTEXT, version: PLAYER_JS_VERSION, method: method };
+      if (value !== undefined) message.value = value;
+      try { frame.contentWindow.postMessage(JSON.stringify(message), '*'); } catch (error) { /* iframe ainda não pronto */ }
+    }
+
+    function subscribe() {
+      send('addEventListener', 'timeupdate');
+      send('addEventListener', 'ended');
+    }
+
+    function finish() {
+      if (done) return;
+      done = true;
+      window.removeEventListener('message', onMessage);
+      track('trackCustom', step.event + 'Complete');
+      unlock();
+    }
+
+    function onMessage(event) {
+      if (event.source !== frame.contentWindow) return;
+      var data = event.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch (error) { return; }
+      }
+      if (!data || data.context !== PLAYER_JS_CONTEXT) return;
+      heard = true;
+      if (data.event === 'ready') subscribe();
+      else if (data.event === 'ended') finish();
+      else if (data.event === 'timeupdate' && data.value && data.value.duration) {
+        /* 95% já conta como assistido: quem fecha nos últimos segundos também marca o evento. */
+        if (data.value.seconds / data.value.duration >= WATCHED_ENOUGH) finish();
+      }
+    }
+
+    window.addEventListener('message', onMessage);
+    /* O "ready" pode sair antes de o ouvinte entrar, então tentamos assinar mais de uma vez. */
+    frame.addEventListener('load', subscribe);
+    [400, 1200, 2500].forEach(function (wait) { later(subscribe, wait); });
+
+    cover.addEventListener('click', function () {
+      send('setCurrentTime', 0);
+      send('unmute');
+      send('setVolume', 100);
+      send('play');
+      cover.hidden = true;
+    });
+
+    /* Rede de segurança: sem nenhuma resposta do player, o botão não pode ficar preso para sempre. */
+    later(function () { if (!heard) unlock(); }, video.unlockSeconds * 1000);
+    return el('div', { class: 'video bn-holder' }, [frame, cover]);
   }
 
   function videoView(step) {
