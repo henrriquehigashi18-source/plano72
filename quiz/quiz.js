@@ -404,13 +404,30 @@
     return holder;
   }
 
-  /* Vídeo no Bunny Stream. O player fica dentro de um iframe e conversa com a página por postMessage
-     (protocolo player.js): assinamos "timeupdate" e "ended" para marcar a conclusão e liberar o botão.
-     A capa por cima começa o vídeo com som no primeiro toque, porque o navegador só libera som com
-     um gesto do visitante. Se o player não responder nada, libera por tempo para o quiz nunca travar. */
-  var PLAYER_JS_CONTEXT = 'player.js';
-  var PLAYER_JS_VERSION = '0.0.11';
+  /* Vídeo no Bunny Stream, controlado pela biblioteca oficial do Bunny (player.js).
+     REGRA DO FUNIL: o botão SEMPRE aparece depois de unlockSeconds, responda o player ou não.
+     Se o vídeo chegar a 95% antes disso, libera na hora e marca o evento de conclusão.
+     A capa por cima liga o som no primeiro toque (o navegador só libera som com um gesto). */
+  var BUNNY_PLAYERJS = 'https://assets.mediadelivery.net/playerjs/playerjs-latest.min.js';
   var WATCHED_ENOUGH = 0.95;
+  var bunnyLibLoading = false;
+  var bunnyLibCallbacks = [];
+
+  function loadBunnyLib(callback) {
+    if (window.playerjs && window.playerjs.Player) return callback();
+    bunnyLibCallbacks.push(callback);
+    if (bunnyLibLoading) return;
+    bunnyLibLoading = true;
+    var script = document.createElement('script');
+    script.src = BUNNY_PLAYERJS;
+    script.onload = function () {
+      bunnyLibLoading = false;
+      if (window.playerjs && window.playerjs.Player) bunnyLibCallbacks.splice(0).forEach(function (cb) { cb(); });
+    };
+    /* Sem a biblioteca o vídeo ainda toca; só não medimos a conclusão. O botão sai pelo tempo. */
+    script.onerror = function () { bunnyLibLoading = false; bunnyLibCallbacks.length = 0; };
+    document.head.appendChild(script);
+  }
 
   function bunnyPlayer(step, video, unlock) {
     var frame = el('iframe', {
@@ -423,59 +440,47 @@
     var cover = el('button', { class: 'video-cover', type: 'button' }, [
       el('span', { text: '🔊 Toque para ouvir' })
     ]);
-    var heard = false;
+    var player = null;
+    var ready = false;
+    var wantsSound = false;
     var done = false;
-
-    function send(method, value) {
-      var message = { context: PLAYER_JS_CONTEXT, version: PLAYER_JS_VERSION, method: method };
-      if (value !== undefined) message.value = value;
-      try { frame.contentWindow.postMessage(JSON.stringify(message), '*'); } catch (error) { /* iframe ainda não pronto */ }
-    }
-
-    function subscribe() {
-      send('addEventListener', 'timeupdate');
-      send('addEventListener', 'ended');
-    }
 
     function finish() {
       if (done) return;
       done = true;
-      window.removeEventListener('message', onMessage);
       track('trackCustom', step.event + 'Complete');
       unlock();
     }
 
-    function onMessage(event) {
-      if (event.source !== frame.contentWindow) return;
-      var data = event.data;
-      if (typeof data === 'string') {
-        try { data = JSON.parse(data); } catch (error) { return; }
-      }
-      if (!data || data.context !== PLAYER_JS_CONTEXT) return;
-      heard = true;
-      if (data.event === 'ready') subscribe();
-      else if (data.event === 'ended') finish();
-      else if (data.event === 'timeupdate' && data.value && data.value.duration) {
-        /* 95% já conta como assistido: quem fecha nos últimos segundos também marca o evento. */
-        if (data.value.seconds / data.value.duration >= WATCHED_ENOUGH) finish();
-      }
+    function startWithSound() {
+      player.setCurrentTime(0);
+      player.unmute();
+      player.setVolume(100);
+      player.play();
     }
 
-    window.addEventListener('message', onMessage);
-    /* O "ready" pode sair antes de o ouvinte entrar, então tentamos assinar mais de uma vez. */
-    frame.addEventListener('load', subscribe);
-    [400, 1200, 2500].forEach(function (wait) { later(subscribe, wait); });
+    /* Espera um ciclo para o iframe já estar na página antes de criar o controle. */
+    later(function () {
+      loadBunnyLib(function () {
+        player = new window.playerjs.Player(frame);
+        player.on('ready', function () {
+          ready = true;
+          player.on('timeupdate', function (data) {
+            if (data && data.duration && data.seconds / data.duration >= WATCHED_ENOUGH) finish();
+          });
+          player.on('ended', finish);
+          if (wantsSound) startWithSound();
+        });
+      });
+    }, 0);
 
     cover.addEventListener('click', function () {
-      send('setCurrentTime', 0);
-      send('unmute');
-      send('setVolume', 100);
-      send('play');
       cover.hidden = true;
+      if (ready) startWithSound();
+      else wantsSound = true;
     });
 
-    /* Rede de segurança: sem nenhuma resposta do player, o botão não pode ficar preso para sempre. */
-    later(function () { if (!heard) unlock(); }, video.unlockSeconds * 1000);
+    later(unlock, video.unlockSeconds * 1000);
     return el('div', { class: 'video bn-holder' }, [frame, cover]);
   }
 
