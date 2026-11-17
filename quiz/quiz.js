@@ -466,7 +466,10 @@
         player.on('ready', function () {
           ready = true;
           player.on('timeupdate', function (data) {
-            if (data && data.duration && data.seconds / data.duration >= WATCHED_ENOUGH) finish();
+            if (!data) return;
+            /* Libera o botão no minuto em que a VSL faz a chamada (ctaSeconds, no tempo do vídeo). */
+            if (video.ctaSeconds && data.seconds >= video.ctaSeconds) unlock();
+            if (data.duration && data.seconds / data.duration >= WATCHED_ENOUGH) finish();
           });
           player.on('ended', finish);
           if (wantsSound) startWithSound();

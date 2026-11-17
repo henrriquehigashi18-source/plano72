@@ -41,7 +41,9 @@
     vsl2: {
       bunny: { library: '811679', id: 'c4e5aa62-7974-4010-8907-adf8299fb06b' },
       youtube: '4mjlV6YcjuI',
-      src: '', poster: '', unlockSeconds: 150
+      /* ctaSeconds: segundo do vídeo em que a VSL pede para tocar no botão (1:46 = 106). O botão aparece aí.
+         unlockSeconds: rede de segurança em tempo de relógio, caso o player não informe o progresso. */
+      src: '', poster: '', ctaSeconds: 106, unlockSeconds: 130
     },
 
     /* Enquanto não houver vídeo, o botão aparece depois deste tempo (em segundos). */
